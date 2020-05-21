@@ -13,6 +13,12 @@ namespace gta5SoloSession
         [DllImport("kernel32.dll")]
         private static extern int ResumeThread(IntPtr hThread);
 
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
+
+        [DllImport("kernel32", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool CloseHandle(IntPtr handle);
+
         public static void Main()
         {
             Console.Title = "GTA5 1인 공개 세션 생성기 Made by green1052";
@@ -27,17 +33,31 @@ namespace gta5SoloSession
                 return;
             }
 
-            SuspendThread(processes[0].Handle);
+            foreach (ProcessThread processThread in processes[0].Threads)
+            {
+                IntPtr pOpenThread = OpenThread(ThreadAccess.SUSPEND_RESUME, false, (uint) processThread.Id);
 
-            Console.WriteLine("GTA5를 일시 중지 했습니다.");
+                SuspendThread(pOpenThread);
 
-            Thread.Sleep(5000);
+                Console.WriteLine("GTA5를 일시 중지 했습니다.");
 
-            ResumeThread(processes[0].Handle);
+                Thread.Sleep(5000);
 
-            Console.WriteLine("GTA5를 재개했습니다.\n아무 키나 눌러 종료하십시오.");
+                ResumeThread(pOpenThread);
 
-            Console.ReadKey();
+                CloseHandle(pOpenThread);
+
+                Console.WriteLine("GTA5를 재개했습니다.\n아무 키나 눌러 종료하십시오.");
+
+                Console.ReadKey();
+
+                break;
+            }
+        }
+
+        private enum ThreadAccess
+        {
+            SUSPEND_RESUME = 0x0002
         }
     }
 }
