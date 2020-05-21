@@ -35,13 +35,13 @@ namespace gta5SoloSession
 
             foreach (ProcessThread processThread in processes[0].Threads)
             {
-                IntPtr pOpenThread = OpenThread(ThreadAccess.SUSPEND_RESUME, false, (uint) processThread.Id);
+                IntPtr pOpenThread = OpenThread(ThreadAccess.SuspendResume, false, (uint) processThread.Id);
 
                 SuspendThread(pOpenThread);
 
                 Console.WriteLine("GTA5를 일시 중지 했습니다.");
 
-                Thread.Sleep(5000);
+                Thread.Sleep(10000);
 
                 ResumeThread(pOpenThread);
 
@@ -57,7 +57,7 @@ namespace gta5SoloSession
 
         private enum ThreadAccess
         {
-            SUSPEND_RESUME = 0x0002
+            SuspendResume = 0x0002
         }
     }
 }
